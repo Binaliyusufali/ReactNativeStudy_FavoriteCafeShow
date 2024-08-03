@@ -1,44 +1,58 @@
-/* eslint-disable react/no-unstable-nested-components */
-/*
-Projemizi rahatlatması açısından FlatList kullanılarak cihazı yormadan ekrana 
-basabilen bir component yapısı sunar bize. Burada kullanılarak cihaz performansı iyileştirildi.
-*/
-import React from 'react';
-import {SafeAreaView, FlatList, StyleSheet, Text} from 'react-native';
-import news_data from './news_data.json';
-import NewsCard from './conponents/NewsCard';
-import ScrollArea from './conponents/ScrollArea/ScrollArea';
+import React, {useState} from 'react';
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 
-const App = () => {
-  const renderNews = ({item}) => <NewsCard news={item} />;
+const data = [
+  {id: 0, name: 'Starbucks', isFavorite: true},
+  {id: 1, name: 'Kahve Dünyası', isFavorite: false},
+  {id: 2, name: 'Espressolab', isFavorite: false},
+  {id: 3, name: 'coffy', isFavorite: true},
+  {id: 4, name: 'Kahveci', isFavorite: false},
+];
 
+function App() {
+  const [cafeList, setCafeList] = useState(data);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+
+  function onFavoritesChange(isFavoriteSelected) {
+    setShowOnlyFavorites(isFavoriteSelected);
+    isFavoriteSelected
+      ? setCafeList(cafeList.filter(cafe => cafe.isFavorite))
+      : setCafeList(data);
+  }
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headerText}>News </Text>
+      <View style={{margin: 10, alignItems: 'center'}}>
+        <Text style={styles.headerText}>Favori Kafeleri Listele</Text>
+        <Switch value={showOnlyFavorites} onValueChange={onFavoritesChange} />
+      </View>
       <FlatList
-        ListHeaderComponent={() => (
-          //ScrrollArea adıyla bir costum component yapısına taşıyalım. ScrollView Alanını
-          <ScrollArea />
+        data={cafeList}
+        renderItem={({item}) => (
+          <Text style={styles.cafePlace}>{item.name}</Text>
         )}
-        /*keyExcractor instagramda çok etkili kullanıyor. Aşağıdaki ve yukarıdaki kalanla
-        gösteriliyor veya tutuluyor.*/
-
-        keyExtractor={item => item.u_id.toString()} //FlatListte vbasılacakların ayırt etmesi için gerekli
-        data={news_data}
-        renderItem={renderNews}
       />
     </SafeAreaView>
   );
-};
+}
+export default App;
 
 const styles = StyleSheet.create({
   container: {
+    margin: 20,
     flex: 1,
-    backgroundColor: '#eceff1',
+    alignItems: 'center',
   },
   headerText: {
-    fontWeight: 'bold',
-    fontSize: 50,
+    fontSize: 20,
+  },
+  cafePlace: {
+    fontSize: 20,
   },
 });
-export default App;
